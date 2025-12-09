@@ -1,8 +1,8 @@
-#root {
-  max-width: 1280px;
+/* #root {
+  max-width: 2000px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
+  display: block;
 }
 
 .logo {
@@ -39,4 +39,26 @@
 
 .read-the-docs {
   color: #888;
+} */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: block; 
+}
+
+body {
+  background-color: #f8f9fa;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  max-width: 100%;
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.main-content {
+  padding-top: 70px;
 }

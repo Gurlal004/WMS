@@ -1,0 +1,12 @@
+{
+  "hosting": [
+    {
+      "target": "wms-for-work",
+      "public": "dist",
+      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+      "rewrites": [
+        { "source": "**", "destination": "/index.html" }
+      ]
+    }
+  ]
+}

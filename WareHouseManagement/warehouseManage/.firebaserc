@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "flash-typing"
+  },
+  "targets": {
+    "flash-typing": {
+      "hosting": {
+        "wms-for-work": [
+          "wms-for-work"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

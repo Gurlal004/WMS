@@ -6,11 +6,13 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from './firebase/config';
 
 function Login(){
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+  if(error){}
 
   async function handleSubmit(e: any) {
     e.preventDefault();
@@ -18,7 +20,7 @@ function Login(){
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("/dashboard"); // redirect after login
+      navigate("/dashboard");
     } catch (err: any) {
       setError(err.message);
     }
@@ -26,7 +28,7 @@ function Login(){
     return(
     <>
         <div className="container mt-5">
-            <form className='p-4 border rounded shadow-sm bg-light'>
+            <form className='p-4 border rounded shadow-sm bg-light' onSubmit={handleSubmit}>
                 <div className='mb-3'>
                     <label htmlFor="username" className='form-label'>Username:</label>
                     <input id="username" type="text" name="username" className='form-control' value={email} onChange={(e) => setEmail(e.target.value)}/>

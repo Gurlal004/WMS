@@ -77,7 +77,7 @@ function RemoveKTNs(){
             art_no: product.art_no,
             ktns: formData.ktn,
             bill_no: formData.bill_no,
-            createdAt: serverTimestamp(),
+            removedAt: serverTimestamp(),
             user: auth.currentUser?.email
         }) 
 

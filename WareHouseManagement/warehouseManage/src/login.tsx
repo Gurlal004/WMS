@@ -1,9 +1,10 @@
 import 'bootstrap/dist/css/bootstrap.min.css'; 
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from './firebase/config';
+import { auth, db } from './firebase/config';
+import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 
 function Login(){
   const navigate = useNavigate();
@@ -19,7 +20,30 @@ function Login(){
     setError("");
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredentials = await signInWithEmailAndPassword(auth, email, password);
+      const userEmail = userCredentials.user.email;
+
+      const settingRef = doc(db, "WMSSettings", "toggleForAllowAdminLoginOnly");
+      const settingSnap = await getDoc(settingRef);
+
+      const isLocked = settingSnap.exists() ? settingSnap.data().toggleAdmin : false;
+
+      if(isLocked){
+        const q = query(collection(db, "WMSUsers"), where("email", "==", userEmail));
+        const querySnap = await getDocs(q);
+
+        let role = "user";
+        if(!querySnap.empty){
+          role = querySnap.docs[0].data().role;
+        }
+
+        if(role !== "admin"){
+          await signOut(auth);
+          alert("⚠️ Maintenance Mode: Only Admins can log in right now.");
+          throw new Error("⚠️ Maintenance Mode: Only Admins can log in right now.");
+        }
+      }
+      
       navigate("/dashboard");
     } catch (err: any) {
       setError(err.message);

@@ -15,6 +15,8 @@ type Product = {
     pkg: number;
     pcs: number;
     location: string;
+    magazyn: string;
+    level: string;
 }
 
 type User = {
@@ -69,7 +71,7 @@ function Dashboard() {
         <>
             <SearchBar search={search} setSearch={setSearch}/>
             <div className="container">
-                <div className="table-responsive">
+                <div className="table-responsive" style={{ overflowX: "auto", maxWidth: "100vw", WebkitOverflowScrolling: "touch" }}>
                     <table className="table table-bordered table-striped text-center">
                     <thead className="table-dark">
                         <tr>
@@ -77,7 +79,9 @@ function Dashboard() {
                             {currentUserRole === "admin" && <th style={{ width: "10%" }}>KTN</th>}
                             {currentUserRole === "admin" && <th style={{ width: "10%" }}>PKG</th>}
                             {currentUserRole === "admin" && <th style={{ width: "10%" }}>PCS</th>}
-                            <th style={{ width: "60%" }}>Location</th>
+                            <th style={{ width: "10%" }}>Magazyn</th>
+                            <th style={{ width: "10%" }}>Level</th>
+                            <th style={{ width: "40%" }}>Location</th>
                             {currentUserRole === "admin" && <th style={{ width: "10%" }}>#</th>}                        
                         </tr>
                     </thead>
@@ -88,6 +92,8 @@ function Dashboard() {
                             {currentUserRole === "admin" && <td>{p.ktn}</td>}
                             {currentUserRole === "admin" && <td>{p.pkg}</td>}
                             {currentUserRole === "admin" && <td>{p.pcs}</td>}
+                            <td className="text-wrap text-break">{p.magazyn}</td>
+                            <td className="text-wrap text-break">{p.level}</td>
                             <td className="text-wrap text-break">{p.location}</td>
                             {currentUserRole === "admin" && <td>
                                 <EditIcon 

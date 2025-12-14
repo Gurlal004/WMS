@@ -1,15 +1,15 @@
 import { useState, useRef } from "react";
-import { db } from "./firebase/config";
+import { auth, db } from "./firebase/config";
 import {collection, addDoc, serverTimestamp} from "firebase/firestore";
 import {useNavigate} from "react-router-dom";
 
 function AddProduct(){
     const navigate = useNavigate()
     const [formData, setFormData] = useState({
-        art_no: "", ktn: 0, pkg: 0, pcs: 0, location: ""
+        art_no: "", ktn: 0, pkg: 0, pcs: 0, level: "", magazyn: "", location: ""
     });
     const [loading, setLoading] = useState(false);
-
+    
     const isSubmitting = useRef(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,6 +35,9 @@ function AddProduct(){
                 pcs: pcs,
                 createdAt: serverTimestamp(),
                 modifiedAt: serverTimestamp(),
+                addedBy: auth.currentUser?.email, 
+                modifiedBy: auth.currentUser?.email,
+                remarks: auth.currentUser?.email,
             });
             setLoading(false);
             navigate("/dashboard");
@@ -73,6 +76,19 @@ function AddProduct(){
                         <input type="number" className="form-control" id="pcs" name="pcs" value={formData.ktn * formData.pkg} onChange={handleChange} readOnly></input>
                     </div>
                 </div>
+                <label>Select Magazyn</label>
+                <select className="form-control mb-2" value={formData.magazyn} onChange={(e) => setFormData(prev => ({...prev, magazyn: e.target.value}))} required>
+                    <option value="">Select Magazyn...</option>
+                    <option value={"Mgzn 1"}>{"Mgzn 1"}</option>
+                    <option value={"Mgzn 2"}>{"Mgzn 2"}</option>
+                    <option value={"Outside"}>{"Outside"}</option>
+                </select>
+                <label>Select Magazyn Level</label>
+                <select className="form-control mb-2" value={formData.level} onChange={(e) => setFormData(prev => ({...prev, level: e.target.value}))} required>
+                    <option value="">Select Magazyn Level...</option>
+                    <option value={"Up"}>{"Up"}</option>
+                    <option value={"Down"}>{"Down"}</option>
+                </select>
                 <div className="form-row">
                     <div className="form-group col-md-12 mb-2">
                         <label htmlFor="location">Location</label>

@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { db } from "./firebase/config";
-import { deleteDoc, doc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDocs, query, where } from "firebase/firestore";
 
 function DeleteProduct(){
     const {id} = useParams<{id: string}>();
@@ -8,6 +8,16 @@ function DeleteProduct(){
 
     const handleConfirmDelete = async () => {
         await deleteDoc(doc(db, "WMSProjects", id!));
+        
+        const removeRef = collection(db, "WMSRemoveInfo");
+        const q = query(removeRef, where("projectId", "==", id));
+        const queryRun = await getDocs(q);
+
+        if(!queryRun.empty){
+            const docToDelete = queryRun.docs[0];
+            await deleteDoc(doc(db, "WMSRemoveInfo", docToDelete.id));
+        }
+
         navigate("/dashboard");
     }
 

@@ -4,7 +4,7 @@ import { db } from "./firebase/config";
 import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 
 type Product = {
-    id:string, art_no: string, ktn: number, pkg: number, pcs: number, location: string,
+    id:string, art_no: string, ktn: number, pkg: number, pcs: number, location: string, magazyn: string, level: string, remarks: string,
 }
 
 function EditProduct(){
@@ -54,6 +54,7 @@ function EditProduct(){
             pcs: product.ktn * product.pkg,
             location: product.location,
             modifiedAt: serverTimestamp(),
+            remarks: product.remarks
         });
         navigate("/dashboard");
     };
@@ -86,10 +87,28 @@ function EditProduct(){
                         <input type="number" className="form-control" id="pcs" name="pcs" value={product.ktn * product.pkg} onChange={handleChange}></input>
                     </div>
                 </div>
+                <label>Select Magazyn</label>
+                <select className="form-control mb-2" value={product.magazyn} onChange={(e) => setProduct(prev => prev ? ({...prev, magazyn: e.target.value}) : prev)} required>
+                    <option value="">Select Magazyn...</option>
+                    <option value={"Mgzn 1"}>{"Mgzn 1"}</option>
+                    <option value={"Mgzn 2"}>{"Mgzn 2"}</option>
+                </select>
+                <label>Select Magazyn Level</label>
+                <select className="form-control mb-2" value={product.level} onChange={(e) => setProduct(prev => prev ? ({...prev, level: e.target.value}) : prev)} required>
+                    <option value="">Select Magazyn Level...</option>
+                    <option value={"Up"}>{"Up"}</option>
+                    <option value={"Down"}>{"Down"}</option>
+                </select>
                 <div className="form-row">
                     <div className="form-group col-md-12 mb-2">
                         <label htmlFor="location">Location</label>
-                        <input type="text" className="form-control" id="location" name="location" value={product.location} onChange={handleChange}></input>
+                        <input type="text" className="form-control" id="location" name="location" value={product.location} onChange={handleChange} required></input>
+                    </div>
+                </div>
+                <div className="form-row">
+                    <div className="form-group col-md-12 mb-2">
+                        <label htmlFor="remarks">Remarks</label>
+                        <input type="text" className="form-control" id="remarks" name="remarks" value={product.remarks} onChange={handleChange}></input>
                     </div>
                 </div>
                 <button type="submit" className="btn btn-primary w-100">Save Product</button>

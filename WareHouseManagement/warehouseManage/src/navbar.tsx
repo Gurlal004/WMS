@@ -1,5 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css'; 
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import HomeIcon from '@mui/icons-material/Home';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from './authContext/authFile';
 import { useContext, useEffect, useState } from 'react';
@@ -87,14 +88,20 @@ function Navbar(){
     return (
     <>
         <nav className="navbar navbar-dark bg-dark px-3 fixed-top">
-            <div className="d-flex w-100 justify-content-between align-items-center">
-                <div className="d-flex gap-3">
-                    <Link className="text-white text-decoration-none" to="/dashboard">Products</Link>
-                    <Link className="text-white text-decoration-none" to="/addProduct">Add New</Link>
-                    <Link className="text-white text-decoration-none" to="/removeKTNs">Remove KTNs</Link>
+            <div className="d-flex w-100 justify-content-between align-items-center flex-nowrap">
+                <div className="d-flex gap-3 align-items-center flex-nowrap overflow-hidden">
+                    <Link
+                    to="/dashboard"
+                    className="text-white text-decoration-none d-flex align-items-center text-nowrap"
+                    title="Products"
+                    >
+                    <HomeIcon fontSize="medium" />
+                    </Link>
+                    <Link className="text-white text-decoration-none text-nowrap" to="/addProduct">Add New</Link>
+                    <Link className="text-white text-decoration-none text-nowrap" to="/removeKTNs">Remove KTNs</Link>
 
                     {isAdmin && (
-                        <div>
+                        <div className="form-check form-switch d-flex align-items-center gap-1 text-nowrap">
                             <input 
                                 className="form-check-input" 
                                 type="checkbox" 
@@ -109,8 +116,7 @@ function Navbar(){
                         </div>
                     )}
                 </div>
-                <div>
-                    
+                <div className="flex-shrink-0 text-nowrap">
                     {authCtx.loggedIn && !isLoading? (<button onClick={authCtx.logout} className='btn btn-danger btn-sm'>Logout</button>) :
                         (<Link className="text-white text-decoration-none" to="/login">Login</Link>)
                     };

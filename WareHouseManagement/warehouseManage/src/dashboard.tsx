@@ -82,7 +82,7 @@ function Dashboard() {
                             <th style={{ width: "10%" }}>Magazyn</th>
                             <th style={{ width: "10%" }}>Level</th>
                             <th style={{ width: "40%" }}>Location</th>
-                            {currentUserRole === "admin" && <th style={{ width: "10%" }}>#</th>}                        
+                            {(currentUserRole === "admin" || currentUserRole === "s_user") && <th style={{ width: "10%" }}>#</th>}                        
                         </tr>
                     </thead>
                     <tbody>
@@ -95,20 +95,28 @@ function Dashboard() {
                             <td className="text-wrap text-break">{p.magazyn}</td>
                             <td className="text-wrap text-break">{p.level}</td>
                             <td className="text-wrap text-break">{p.location}</td>
-                            {currentUserRole === "admin" && <td>
-                                <EditIcon 
-                                style={{ cursor: "pointer" }}
-                                color="primary"
-                                onClick={() => navigate(`/editProduct/${p.id}`)}>
-                                </EditIcon>
-                                 <DeleteIcon 
-                                    onClick={() => navigate(`/deleteProduct/${p.id}`)}
-                                />
-                                <InfoIcon
-                                    onClick={() => navigate(`/productInfo/${p.id}`)
-                                    }
-                                />
-                            </td>}
+                            {(currentUserRole === "admin" || currentUserRole === "s_user") && (
+                                <td>
+                                    <EditIcon
+                                    style={{ cursor: "pointer" }}
+                                    color="primary"
+                                    onClick={() => navigate(`/editProduct/${p.id}`)}
+                                    />
+
+                                    {currentUserRole === "admin" && (
+                                    <>
+                                        <DeleteIcon
+                                        style={{ cursor: "pointer" }}
+                                        onClick={() => navigate(`/deleteProduct/${p.id}`)}
+                                        />
+                                        <InfoIcon
+                                        style={{ cursor: "pointer" }}
+                                        onClick={() => navigate(`/productInfo/${p.id}`)}
+                                        />
+                                    </>
+                                    )}
+                                </td>
+                                )}
                         </tr>
                         ))}
                     </tbody>

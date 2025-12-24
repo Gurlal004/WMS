@@ -14,8 +14,14 @@ function DeleteProduct(){
         const queryRun = await getDocs(q);
 
         if(!queryRun.empty){
-            const docToDelete = queryRun.docs[0];
-            await deleteDoc(doc(db, "WMSRemoveInfo", docToDelete.id));
+            // const docToDelete = queryRun.docs[0];
+            // await deleteDoc(doc(db, "WMSRemoveInfo", docToDelete.id));
+            // queryRun.forEach(async (doc) => {
+            //     // 3. Delete THIS specific document
+            //     await deleteDoc(doc.ref); 
+            // });
+            const deletePromises = queryRun.docs.map((doc) => deleteDoc(doc.ref));
+            await Promise.all(deletePromises);
         }
 
         navigate("/dashboard");

@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState, type ChangeEvent } from "react";
-import { db } from "./firebase/config";
-import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "./firebase/config";
+import { doc, getDoc, updateDoc, serverTimestamp, addDoc, collection } from "firebase/firestore";
 
 type Product = {
     id:string, art_no: string, ktn: number, pkg: number, pcs: number, location: string, magazyn: string, level: string, remarks: string,
@@ -10,8 +10,10 @@ type Product = {
 function EditProduct(){
     const {id} = useParams<{id: string}>();
     const navigate = useNavigate();
+    const userEmail = auth.currentUser?.email;
 
     const [product, setProduct] = useState<Product | null>(null);
+    const [productCopy, setProductCopy] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -22,12 +24,13 @@ function EditProduct(){
             const docSnap = await getDoc(docRef);
 
             if (docSnap.exists()) {
-                setProduct({
+                const data = {
                     id: docSnap.id,
                     ...(docSnap.data() as Omit<Product, "id">),
-                });
+                };
+                setProduct(data);
+                setProductCopy({...data});
             }
-
             setLoading(false);
         }
         fetchProduct();
@@ -44,19 +47,46 @@ function EditProduct(){
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if(!product) return;
-        const docRef = doc(db, "WMSProjects", product.id);
+        if(!product || !productCopy) return;
 
-        await updateDoc(docRef, {
-            art_no: product.art_no,
-            ktn: product.ktn,
-            pkg: product.pkg,
-            pcs: product.ktn * product.pkg,
-            location: product.location,
-            modifiedAt: serverTimestamp(),
-            remarks: product.remarks
-        });
-        navigate("/dashboard");
+        try{
+            const changes: string[] = [];
+            const fieldsToCheck: (keyof Product)[] = ["art_no", "ktn", "pkg", "location", "magazyn", "level", "remarks"];
+
+            fieldsToCheck.forEach((key) => {
+                changes.push(`${key}: ${productCopy[key]} -> ${product[key]}`)
+            });
+
+            if(changes.length > 0){
+                await addDoc(collection(db, "WMSEditProductLogs"), {
+                    projectId: product.id,
+                    art_no: product.art_no,
+                    location: product.location,
+                    level: product.level,
+                    magazyn: product.magazyn,
+                    changedBy: userEmail,
+                    changedAt: serverTimestamp(),
+                    changes: changes
+                });
+            }
+
+            const docRef = doc(db, "WMSProjects", product.id);
+            await updateDoc(docRef, {
+                art_no: product.art_no,
+                ktn: product.ktn,
+                pkg: product.pkg,
+                pcs: product.ktn * product.pkg,
+                location: product.location,
+                magazyn: product.magazyn,
+                level: product.level,
+                remarks: product.remarks,
+                modifiedAt: serverTimestamp(),
+                modifiedBy: userEmail
+            });
+            navigate("/dashboard");
+        }catch(error){
+            console.error("Error saving product", error);
+        }
     };
 
     return(

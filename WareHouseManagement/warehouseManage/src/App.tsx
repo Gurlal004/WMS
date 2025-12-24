@@ -8,7 +8,9 @@ import {Routes, Route} from 'react-router-dom'
 import EditProduct from './editProduct'
 import DeleteProduct from './deleteProduct'
 import RemoveKTNs from './removeKTNs';
-import ProductInfo from './productInfo'
+import ProductInfo from './productInfo';
+import GetProductLog from './getProductLog';
+import ProductFromLogInfo from './productFromLogInfo'
 
 function App() {
 
@@ -24,6 +26,8 @@ function App() {
         <Route path='/deleteProduct/:id' element={<ProtectedRoute><DeleteProduct/></ProtectedRoute>}/>
         <Route path='/removeKTNs' element={<ProtectedRoute><RemoveKTNs/></ProtectedRoute>}/>
         <Route path='/productInfo/:id' element={<ProtectedRoute><ProductInfo/></ProtectedRoute>}/>
+        <Route path='/iwanttogetproducteditlog/' element={<ProtectedRoute><GetProductLog/></ProtectedRoute>}/>
+        <Route path='/productFromLogInfo/:id' element={<ProtectedRoute><ProductFromLogInfo/></ProtectedRoute>}/>
       </Routes>
     </div>
     </>

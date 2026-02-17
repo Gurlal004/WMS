@@ -295,11 +295,11 @@ function Navbar(){
                 setIsAdmin(null);
                 
                 // A. Check Local Storage first (Zero Cost)
-                const cachedRole = localStorage.getItem(`role_${user.email}`);
-                if (cachedRole) {
-                    setIsAdmin(cachedRole.toLowerCase() === 'admin');
-                    return; 
-                }
+                // const cachedRole = localStorage.getItem(`role_${user.email}`);
+                // if (cachedRole) {
+                //     setIsAdmin(cachedRole.toLowerCase() === 'admin');
+                //     return; 
+                // }
 
                 // B. Fetch from Firestore (1 Read)
                 try {
@@ -323,7 +323,7 @@ function Navbar(){
                     if (!querySnapshot.empty) {
                         const userData = querySnapshot.docs[0].data();
                         const role = userData.role || "user";
-                        
+                        console.log(role);
                         // Save to cache
                         localStorage.setItem(`role_${user.email}`, role);
                         

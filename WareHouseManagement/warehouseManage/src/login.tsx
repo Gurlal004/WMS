@@ -1,17 +1,26 @@
 import 'bootstrap/dist/css/bootstrap.min.css'; 
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from './firebase/config';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
+import { AuthContext } from './authContext/authFile'; // use the same context path you use in ProtectedRoute
 
 function Login(){
   const navigate = useNavigate();
+  const authCtx = useContext(AuthContext);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+
+   useEffect(() => {
+    if (!authCtx) return;
+    if (!authCtx.loading && authCtx.loggedIn) {
+      navigate("/dashboard");
+    }
+  }, [authCtx?.loading, authCtx?.loggedIn, navigate]);
 
   if(error){}
 

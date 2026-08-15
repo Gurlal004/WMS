@@ -41,7 +41,7 @@ function AddProduct(){
             // 3. CHANGE: Convert strings to Numbers ONLY when saving
             const numericKtn = Number(formData.ktn);
             const numericPkg = Number(formData.pkg);
-            const pcs = numericKtn * numericPkg;
+            const pcs = Math.ceil((numericKtn * numericPkg) * 100) / 100;
 
             await addDoc(collection(db, "WMSProjects"), {
                 ...formData,
@@ -118,7 +118,7 @@ function AddProduct(){
                             id="pcs" 
                             name="pcs" 
                             // 5. CHANGE: Convert to number just for calculation display
-                            value={Number(formData.ktn) * Number(formData.pkg)} 
+                            value={Math.ceil((Number(formData.ktn) * Number(formData.pkg)) * 100) / 100} 
                             style={{fontSize: "1.2em", fontWeight: 700}}
                             readOnly
                         />

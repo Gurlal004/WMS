@@ -256,7 +256,7 @@ function RemoveKTNs(){
             // 2. Update Stock
             await updateDoc(projectRef, {
                 ktn: product.ktn - Number(formData.ktn),
-                pcs: (product.ktn - Number(formData.ktn)) * product.pkg,
+                pcs: Math.ceil(((product.ktn - Number(formData.ktn)) * product.pkg) * 100) / 100,
                 modifiedAt: serverTimestamp()
             });
 

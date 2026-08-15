@@ -88,7 +88,7 @@ function EditProduct(){
                 art_no: product.art_no,
                 ktn: product.ktn,
                 pkg: product.pkg,
-                pcs: product.ktn * product.pkg,
+                pcs: Math.ceil((product.ktn * product.pkg) * 100) / 100,
                 location: product.location,
                 magazyn: product.magazyn,
                 level: product.level,
@@ -131,7 +131,7 @@ function EditProduct(){
                 <div className="form-row">
                     <div className="form-group col-md-12 mb-2">
                         <label htmlFor="pcs" style={{fontSize: "1.2em", fontWeight: 700}}>PCS</label>
-                        <input type="number" className="form-control" id="pcs" name="pcs" value={product.ktn * product.pkg} style={{fontSize: "1.2em", fontWeight: 700}} readOnly></input>
+                        <input type="number" className="form-control" id="pcs" name="pcs" value={Math.ceil((product.ktn * product.pkg) * 100) / 100} style={{fontSize: "1.2em", fontWeight: 700}} readOnly></input>
                     </div>
                 </div>
                 <label style={{fontSize: "1.2em", fontWeight: 700}}>Select Magazyn</label>

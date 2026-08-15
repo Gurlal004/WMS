@@ -36,7 +36,7 @@ function App() {
         <Route path='/login' element={<Login/>}/>
         <Route path='/dashboard' element={<ProtectedRoute><Dashboard/></ProtectedRoute>}/>
         <Route path='/addProduct' element={<ProtectedRoute><AddProduct/></ProtectedRoute>}/>
-        <Route path='/editProduct/:id' element={<ProtectedRoute><EditProduct/></ProtectedRoute>}/>\
+        <Route path='/editProduct/:id' element={<ProtectedRoute><EditProduct/></ProtectedRoute>}/>
         <Route path='/deleteProduct/:id' element={<ProtectedRoute><DeleteProduct/></ProtectedRoute>}/>
         <Route path='/removeKTNs' element={<ProtectedRoute><RemoveKTNs/></ProtectedRoute>}/>
         <Route path='/productInfo/:id' element={<ProtectedRoute><ProductInfo/></ProtectedRoute>}/>
@@ -48,4 +48,4 @@ function App() {
   )
 }
 
-export default App
+export default App;

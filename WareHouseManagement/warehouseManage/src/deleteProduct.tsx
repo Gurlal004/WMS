@@ -6,26 +6,52 @@ function DeleteProduct(){
     const {id} = useParams<{id: string}>();
     const navigate = useNavigate();
 
-    const handleConfirmDelete = async () => {
-        await deleteDoc(doc(db, "WMSProjects", id!));
+    // const handleConfirmDelete = async () => {
+    //     await deleteDoc(doc(db, "WMSProjects", id!));
         
-        const removeRef = collection(db, "WMSRemoveInfo");
-        const q = query(removeRef, where("projectId", "==", id));
-        const queryRun = await getDocs(q);
+    //     const removeRef = collection(db, "WMSRemoveInfo");
+    //     const q = query(removeRef, where("projectId", "==", id));
+    //     const queryRun = await getDocs(q);
 
-        if(!queryRun.empty){
-            // const docToDelete = queryRun.docs[0];
-            // await deleteDoc(doc(db, "WMSRemoveInfo", docToDelete.id));
-            // queryRun.forEach(async (doc) => {
-            //     // 3. Delete THIS specific document
-            //     await deleteDoc(doc.ref); 
-            // });
-            const deletePromises = queryRun.docs.map((doc) => deleteDoc(doc.ref));
+    //     if(!queryRun.empty){
+    //         // const docToDelete = queryRun.docs[0];
+    //         // await deleteDoc(doc(db, "WMSRemoveInfo", docToDelete.id));
+    //         // queryRun.forEach(async (doc) => {
+    //         //     // 3. Delete THIS specific document
+    //         //     await deleteDoc(doc.ref); 
+    //         // });
+    //         const deletePromises = queryRun.docs.map((doc) => deleteDoc(doc.ref));
+    //         await Promise.all(deletePromises);
+    //     }
+
+    //     navigate("/dashboard");
+    // }
+    const handleConfirmDelete = async () => {
+        // 1. Delete Main Product
+        await deleteDoc(doc(db, "WMSProjects", id!));
+                
+        // 2. Delete Remove Info Logs
+        const removeRef = collection(db, "WMSRemoveInfo");
+        const qRemove = query(removeRef, where("projectId", "==", id));
+        const queryRunRemove = await getDocs(qRemove);
+        
+        if(!queryRunRemove.empty){
+            const deletePromises = queryRunRemove.docs.map((doc) => deleteDoc(doc.ref));
             await Promise.all(deletePromises);
         }
 
+        // 3. NEW: Delete Edit History Logs
+        const editLogsRef = collection(db, "WMSEditProductLogs");
+        const qEdit = query(editLogsRef, where("projectId", "==", id));
+        const queryRunEdit = await getDocs(qEdit);
+
+        if(!queryRunEdit.empty){
+            const deleteEditPromises = queryRunEdit.docs.map((doc) => deleteDoc(doc.ref));
+            await Promise.all(deleteEditPromises);
+        }
+
         navigate("/dashboard");
-    }
+    }   
 
     return (
     <>

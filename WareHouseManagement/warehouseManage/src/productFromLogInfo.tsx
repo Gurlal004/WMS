@@ -94,6 +94,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { db } from "./firebase/config";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { formatSafeDate } from "./utils";
 
 type ProductLog = {
     id: string;
@@ -175,7 +176,7 @@ function ProductFromLogInfo() {
             ) : (
                 /* Responsive Table Wrapper (Same as Dashboard) */
                 <div className="table-responsive" style={{ overflowX: "auto", maxWidth: "100vw", WebkitOverflowScrolling: "touch" }}>
-                    <table className="table table-bordered table-striped text-center">
+                    <table className="table table-bordered table-striped text-center" style={{fontSize: "1.5em", fontWeight: 700}}>
                         <thead className="table-dark">
                             <tr>
                                 <th style={{ whiteSpace: "nowrap", width: "20%" }}>Date</th>
@@ -188,7 +189,7 @@ function ProductFromLogInfo() {
                                 <tr key={log.id}>
                                     {/* Date Column */}
                                     <td style={{ whiteSpace: "nowrap" }}>
-                                        {log.changedAt?.toDate().toLocaleString()}
+                                        {formatSafeDate(log.changedAt)}
                                     </td>
                                     
                                     {/* User Column */}

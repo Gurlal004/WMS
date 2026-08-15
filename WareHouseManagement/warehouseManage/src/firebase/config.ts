@@ -8,19 +8,19 @@ import { getFirestore } from "firebase/firestore";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyABAdQceyk0Z3E0Axl1wwo4_rvX1Chxnrs",
-  authDomain: "flash-typing.firebaseapp.com",
-  projectId: "flash-typing",
-  storageBucket: "flash-typing.firebasestorage.app",
-  messagingSenderId: "108811300815",
-  appId: "1:108811300815:web:72d82867c3924f3b01ecba",
-  measurementId: "G-LG5ZC19K7P"
+  apiKey: "AIzaSyB2W97bmc9zX6HikeUjVZRo1r_8R74wcLQ",
+  authDomain: "wms-work.firebaseapp.com",
+  projectId: "wms-work",
+  storageBucket: "wms-work.firebasestorage.app",
+  messagingSenderId: "980440205178",
+  appId: "1:980440205178:web:5f9cfab880bc3223f178c3",
+  measurementId: "G-S7EF7KD7GV"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-setPersistence(auth, browserLocalPersistence).catch(console.error);
+setPersistence(auth,  browserLocalPersistence).catch(console.error);
 const db = getFirestore(app);
 
 export {auth};  

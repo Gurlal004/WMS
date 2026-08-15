@@ -88,7 +88,7 @@ function GetProductLog(){
 
                 {productLog.length > 0 && (
                     <div className="table-responsive" style={{ overflowX: "auto", maxWidth: "100vw", WebkitOverflowScrolling: "touch" }}>
-                        <table className="table table-bordered table-striped text-center">
+                        <table className="table table-bordered table-striped text-center" style={{fontSize: "1.5em", fontWeight: 700}}>
                             <thead className="table-dark">
                                 <tr>
                                     <th style={{ whiteSpace: "nowrap", width: "10%" }}>Art No</th>

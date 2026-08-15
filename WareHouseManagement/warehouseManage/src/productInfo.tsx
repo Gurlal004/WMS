@@ -188,6 +188,7 @@ import { useParams } from "react-router-dom";
 import { auth, db } from "./firebase/config";
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from "@mui/icons-material/Check";
+import { formatSafeDate } from "./utils";
 
 type ProductRemoveInfoType = {
     id: string, art_no: string, bill_no: number, ktns: number, user: string, removedAt: Timestamp,
@@ -311,11 +312,11 @@ function ProductInfo(){
         <div className="container mt-4">
             {proInfo && (
                 <div className="mb-4">
-                    <p><strong>Remarks:</strong> {proInfo.remarks || "None"}</p>
-                    <p><strong>Added by:</strong> {proInfo.addedBy}</p>
-                    <p><strong>Modified by:</strong> {proInfo.modifiedBy}</p>
-                    <p><strong>Added at:</strong> {proInfo.createdAt?.toDate().toLocaleString()}</p>
-                    <p><strong>Modified at:</strong> {proInfo.modifiedAt?.toDate().toLocaleString()}</p>
+                    <p style={{fontSize: "1.5em"}} ><strong>Remarks:</strong> {proInfo.remarks || "None"}</p>
+                    <p style={{fontSize: "1.5em"}} ><strong>Added by:</strong> {proInfo.addedBy}</p>
+                    <p style={{fontSize: "1.5em"}} ><strong>Modified by:</strong> {proInfo.modifiedBy}</p>
+                    <p style={{fontSize: "1.5em"}} ><strong>Added at:</strong> {formatSafeDate(proInfo.createdAt)}</p>
+                    <p style={{fontSize: "1.5em"}} ><strong>Modified at:</strong> {formatSafeDate(proInfo.modifiedAt)}</p>
                 </div>
             )}
 
@@ -328,8 +329,8 @@ function ProductInfo(){
             )}
 
             {removed.length > 0 && (
-                <div className="table-responsive">
-                    <table className="table table-bordered table-hover">
+                <div className="table-responsive" style={{ overflowX: "auto", maxWidth: "100vw", WebkitOverflowScrolling: "touch" }}>
+                    <table className="table table-bordered table-hover" style={{fontSize: "1.5em", fontWeight: 700}}>
                         <thead className="table-light">
                             <tr>
                                 <th>Bill No</th>
@@ -367,7 +368,7 @@ function ProductInfo(){
                                         )}
                                     </td>
                                     <td>{r.user}</td>
-                                    <td>{r.removedAt?.toDate().toLocaleString()}</td>
+                                    <td>{formatSafeDate(r.removedAt)}</td>
                                     {currentUserRole === "admin" && (
                                         <td>
                                             {editingId === r.id ? (

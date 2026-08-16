@@ -28,60 +28,67 @@ function Login(){
   async function handleSubmit(e: any) {
     e.preventDefault();
     setError("");
-
     try {
-      const userCredentials = await signInWithEmailAndPassword(auth, email, password);
-      const userEmail = userCredentials.user.email;
+        const userCredentials = await signInWithEmailAndPassword(auth, email, password);
+        const userEmail = userCredentials.user.email;
+        
+        // 1. Fetch Lock Settings
+        const settingRef = doc(db, "WMSSettings", "toggleForAllowAdminLoginOnly");
+        const settingSnap = await getDoc(settingRef);
+        const isLocked = settingSnap.exists() ? settingSnap.data().toggleAdmin : false;
+        
+        let role = "user"; // Default
 
-      const settingRef = doc(db, "WMSSettings", "toggleForAllowAdminLoginOnly");
-      const settingSnap = await getDoc(settingRef);
-
-      const isLocked = settingSnap.exists() ? settingSnap.data().toggleAdmin : false;
-
-      let role = "user";
-
-      if(isLocked){
-        const q = query(collection(db, "WMSUsers"), where("email", "==", userEmail));
-        const querySnap = await getDocs(q);
-
-        let role = "user";
-        if(!querySnap.empty){
-          role = querySnap.docs[0].data().role;
+        // 2. ROBUST ROLE FETCH (Case-Insensitive)
+        let q = query(collection(db, "WMSUsers"), where("email", "==", userEmail));
+        let querySnap = await getDocs(q);
+        
+        // Fallback for case-sensitivity
+        if (querySnap.empty && userEmail) {
+            q = query(collection(db, "WMSUsers"), where("email", "==", userEmail.toLowerCase()));
+            querySnap = await getDocs(q);
+        }
+        
+        if (!querySnap.empty) {
+            role = querySnap.docs[0].data().role?.toLowerCase() || "user";
         }
 
-        if(role !== "admin"){
-          await signOut(auth);
-          alert("⚠️ Maintenance Mode: Only Admins can log in right now.");
-          throw new Error("⚠️ Maintenance Mode: Only Admins can log in right now.");
+        // 3. Evaluate Admin Lock
+        if (isLocked && role !== "admin") {
+            await signOut(auth);
+            throw new Error("Maintenance Mode: Only Admins can log in right now.");
         }
-      }
 
-      if (role === "user" && isOutsideWorkingHoursInPoland()) {
-        await signOut(auth);
-        throw new Error("System is closed for regular users between 5:20 PM and 7:00 AM (Warsaw Time).");
-      }
-      
-      navigate("/dashboard");
+        // 4. Evaluate Time Cutoff 
+        if (role === "user" && isOutsideWorkingHoursInPoland()) {
+            await signOut(auth);
+            throw new Error("System is closed for regular users between 5:20 PM and 7:00 AM (Warsaw Time).");
+        }
+              
+        navigate("/dashboard");
     } catch (err: any) {
-      setError(err.message);
+        console.error("Login Error: ", err);
+        setError(err.message);
     }
-  }
-    return(
-    <>
-        <div className="container mt-5">
-            <form className='p-4 border rounded shadow-sm bg-light' onSubmit={handleSubmit}>
-                <div className='mb-3'>
-                    <label htmlFor="username" className='form-label'>Username:</label>
-                    <input id="username" type="text" name="username" className='form-control' value={email} onChange={(e) => setEmail(e.target.value)}/>
-    
-                    <label htmlFor="password" className='form-label'>Password</label>
-                    <input id="password" type="password" name="username" className='form-control' value={password} onChange={(e) => setPassword(e.target.value)} />
-                </div>
-                <button type="submit" className='btn btn-primary w-75'>Submit</button>
-            </form>
-        </div>
-    </>
-    );
+}
+
+return(
+    <div className="container mt-5">
+        {/* NEW: VISUAL ERROR ALERT SO IT STOPS FAILING SILENTLY */}
+        {error && <div className="alert alert-danger text-center shadow-sm">{error}</div>}
+
+        <form className='p-4 border rounded shadow-sm bg-light' onSubmit={handleSubmit}>
+            <div className='mb-3'>
+                <label htmlFor="username" className='form-label'>Username:</label>
+                <input id="username" type="text" name="username" className='form-control' value={email} onChange={(e) => setEmail(e.target.value)}/>
+                
+                <label htmlFor="password" className='form-label mt-2'>Password</label>
+                <input id="password" type="password" name="password" className='form-control' value={password} onChange={(e) => setPassword(e.target.value)} />
+            </div>
+            <button type="submit" className='btn btn-primary w-75'>Submit</button>
+        </form>
+    </div>
+  );
 }
 
 export default Login;

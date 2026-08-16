@@ -384,10 +384,19 @@ function Navbar(){
             }
 
             // Condition B: Time Cutoff for standard users
-            if (userRole === "user" && isOutsideWorkingHoursInPoland()) {
-                alert("Access Restricted: Warehouse operations are closed for regular users between 5:20 PM and 7:00 AM (Warsaw Time).");
+            // if (userRole === "user" && isOutsideWorkingHoursInPoland()) {
+            //     alert("Access Restricted: Warehouse operations are closed for regular users between 5:20 PM and 7:00 AM (Warsaw Time).");
+            //     authCtx.logout();
+            //     navigate("/login");
+            // }
+            // Condition B: Time Cutoff for users and super users
+            if ((userRole === "user" || userRole === "s_user") && isOutsideWorkingHoursInPoland(userRole)) {
+                const cutoffTime = userRole === "s_user" ? "10:00 PM" : "5:20 PM";
+                alert(`Access Restricted: Warehouse operations are closed for your role between ${cutoffTime} and 7:00 AM (Warsaw Time).`);
+                
                 authCtx.logout();
                 navigate("/login");
+                return;
             }
         };
 

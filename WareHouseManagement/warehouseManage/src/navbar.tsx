@@ -278,13 +278,14 @@ import { useContext, useEffect, useState } from 'react';
 import { auth, db } from "./firebase/config";
 import { collection, doc, getDocs, limit, onSnapshot, query, updateDoc, where } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
+import { isOutsideWorkingHoursInPoland } from './utils';
 
 function Navbar(){
     const authCtx = useContext(AuthContext);
     const navigate = useNavigate();
 
     // Start as NULL (Loading) so we don't kick users out prematurely
-    const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+    const [userRole, setUserRole] = useState<string | null>(null);
     const [isLocked, setIsLocked] = useState(false);
 
     // 1. ROLE CHECK
@@ -292,7 +293,7 @@ function Navbar(){
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user && user.email) {
                 // Reset to loading state immediately to prevent race conditions
-                setIsAdmin(null);
+                setUserRole(null);
                 
                 // A. Check Local Storage first (Zero Cost)
                 // const cachedRole = localStorage.getItem(`role_${user.email}`);
@@ -327,16 +328,16 @@ function Navbar(){
                         // Save to cache
                         localStorage.setItem(`role_${user.email}`, role);
                         
-                        setIsAdmin(role.toLowerCase() === "admin");
+                        setUserRole(role.toLowerCase());
                     } else {
-                        setIsAdmin(false);
+                        setUserRole("user");
                     }
                 } catch (error) {
                     console.error("Error checking role:", error);
-                    setIsAdmin(false);
+                    setUserRole("user");
                 }
             } else {
-                setIsAdmin(false);
+                setUserRole("user");
                 localStorage.clear(); 
             }
         });
@@ -345,25 +346,62 @@ function Navbar(){
     }, []);
 
     // 2. MAINTENANCE LOCK LISTENER
-    useEffect(() => {
-        const logoutOthers = onSnapshot(doc(db, "WMSSettings", "toggleForAllowAdminLoginOnly"), (docSnapshot) => {
-            if(docSnapshot.exists()){
-                const locked = docSnapshot.data().toggleAdmin;  
-                setIsLocked(locked);
+    // useEffect(() => {
+    //     const logoutOthers = onSnapshot(doc(db, "WMSSettings", "toggleForAllowAdminLoginOnly"), (docSnapshot) => {
+    //         if(docSnapshot.exists()){
+    //             const locked = docSnapshot.data().toggleAdmin;  
+    //             setIsLocked(locked);
                 
-                // SAFETY CHECK: Only kick if isAdmin is explicitly FALSE.
-                // If isAdmin is null (loading), we wait.
-                if(locked && auth.currentUser && isAdmin === false){
-                    if(authCtx && authCtx.logout){
-                        alert("Maintenance Mode Initiated: Admin Access Only.");
-                        authCtx.logout();
-                        navigate("/login");
-                    }
-                }
+    //             // SAFETY CHECK: Only kick if isAdmin is explicitly FALSE.
+    //             // If isAdmin is null (loading), we wait.
+    //             if(locked && auth.currentUser && isAdmin === false){
+    //                 if(authCtx && authCtx.logout){
+    //                     alert("Maintenance Mode Initiated: Admin Access Only.");
+    //                     authCtx.logout();
+    //                     navigate("/login");
+    //                 }
+    //             }
+    //         }
+    //     });
+    //     return () => logoutOthers();
+    // }, [isAdmin, authCtx, navigate]);
+    useEffect(() => {
+        const unsubscribeLock = onSnapshot(doc(db, "WMSSettings", "toggleForAllowAdminLoginOnly"), (docSnapshot) => {
+            if(docSnapshot.exists()){
+                setIsLocked(docSnapshot.data().toggleAdmin);
             }
         });
-        return () => logoutOthers();
-    }, [isAdmin, authCtx, navigate]);
+
+        const evaluateAccess = () => {
+            if (!auth.currentUser || !authCtx || !userRole) return;
+
+            // Condition A: Manual Admin Lock
+            if (isLocked && userRole !== "admin") {
+                alert("Maintenance Mode Initiated: Admin Access Only.");
+                authCtx.logout();
+                navigate("/login");
+                return;
+            }
+
+            // Condition B: Time Cutoff for standard users
+            if (userRole === "user" && isOutsideWorkingHoursInPoland()) {
+                alert("Access Restricted: Warehouse operations are closed for regular users between 5:20 PM and 7:00 AM (Warsaw Time).");
+                authCtx.logout();
+                navigate("/login");
+            }
+        };
+
+        // Run immediately
+        evaluateAccess();
+
+        // Run checking interval every 60 seconds
+        const cronId = setInterval(evaluateAccess, 60000);
+
+        return () => {
+            unsubscribeLock();
+            clearInterval(cronId);
+        };
+    }, [userRole, isLocked, authCtx, navigate]);
 
     const handleLockToggle = async () => {
         try{
@@ -393,7 +431,7 @@ function Navbar(){
                     <Link className="text-white text-decoration-none text-nowrap" to="/addProduct">Add New</Link>
                     <Link className="text-white text-decoration-none text-nowrap" to="/removeKTNs">Remove KTNs</Link>
 
-                    {isAdmin === true && (
+                    {userRole === "admin" && (
                         <div className="form-check form-switch d-flex align-items-center gap-1 text-nowrap">
                             <input 
                                 className="form-check-input" 

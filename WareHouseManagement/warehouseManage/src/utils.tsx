@@ -26,3 +26,34 @@ export const formatSafeDate = (dateVal: any): string => {
         return "Error";
     }
 };
+
+export const isOutsideWorkingHoursInPoland = (): boolean => {
+    const now = new Date();
+    
+    // Fetch current time strictly in Warsaw, ignoring the user's local PC time
+    const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'Europe/Warsaw',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false // Force 24-hour clock
+    });
+    
+    const parts = formatter.formatToParts(now);
+    
+    // Some browsers format midnight as 24 in Intl, so we standardize it to 0
+    let hour = parseInt(parts.find(p => p.type === 'hour')?.value || "0", 10);
+    if (hour === 24) hour = 0; 
+    
+    const min = parseInt(parts.find(p => p.type === 'minute')?.value || "0", 10);
+
+    // const hour: number = 18; // 6:00 PM (Past the 5:20 PM cutoff)
+    // const min: number = 0;
+
+    // Closed Condition 1: After 17:20 (5:20 PM)
+    const isAfterClose = hour > 17 || (hour === 17 && min >= 20);
+    
+    // Closed Condition 2: Before 07:00 (7:00 AM)
+    const isBeforeOpen = hour < 7;
+
+    return isAfterClose || isBeforeOpen;
+};

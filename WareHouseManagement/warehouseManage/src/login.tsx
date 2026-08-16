@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { auth, db } from './firebase/config';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { AuthContext } from './authContext/authFile'; // use the same context path you use in ProtectedRoute
+import { isOutsideWorkingHoursInPoland } from './utils';
 
 function Login(){
   const navigate = useNavigate();
@@ -37,6 +38,8 @@ function Login(){
 
       const isLocked = settingSnap.exists() ? settingSnap.data().toggleAdmin : false;
 
+      let role = "user";
+
       if(isLocked){
         const q = query(collection(db, "WMSUsers"), where("email", "==", userEmail));
         const querySnap = await getDocs(q);
@@ -51,6 +54,11 @@ function Login(){
           alert("⚠️ Maintenance Mode: Only Admins can log in right now.");
           throw new Error("⚠️ Maintenance Mode: Only Admins can log in right now.");
         }
+      }
+
+      if (role === "user" && isOutsideWorkingHoursInPoland()) {
+        await signOut(auth);
+        throw new Error("System is closed for regular users between 5:20 PM and 7:00 AM (Warsaw Time).");
       }
       
       navigate("/dashboard");

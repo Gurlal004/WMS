@@ -41,13 +41,13 @@ export const isOutsideWorkingHoursInPoland = (): boolean => {
     const parts = formatter.formatToParts(now);
     
     // Some browsers format midnight as 24 in Intl, so we standardize it to 0
-    // let hour = parseInt(parts.find(p => p.type === 'hour')?.value || "0", 10);
-    // if (hour === 24) hour = 0; 
+    let hour = parseInt(parts.find(p => p.type === 'hour')?.value || "0", 10);
+    if (hour === 24) hour = 0; 
     
-    // const min = parseInt(parts.find(p => p.type === 'minute')?.value || "0", 10);
+    const min = parseInt(parts.find(p => p.type === 'minute')?.value || "0", 10);
 
-    const hour: number = 18; // 6:00 PM (Past the 5:20 PM cutoff)
-    const min: number = 0;
+    // const hour: number = 18; // 6:00 PM (Past the 5:20 PM cutoff)
+    // const min: number = 0;
 
     // Closed Condition 1: After 17:20 (5:20 PM)
     const isAfterClose = hour > 17 || (hour === 17 && min >= 20);

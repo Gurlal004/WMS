@@ -65,12 +65,18 @@ function Login(){
         //     throw new Error("System is closed for regular users between 5:20 PM and 7:00 AM (Warsaw Time).");
         // }
         // 4. Evaluate Time Cutoff based on Role
-        if ((role === "user" || role === "s_user") && isOutsideWorkingHoursInPoland(role)) {
-            await signOut(auth);
+        // if ((role === "user" || role === "s_user") && isOutsideWorkingHoursInPoland(role)) {
+        //     await signOut(auth);
             
-            // Give them a role-specific error message
-            const cutoffTime = role === "s_user" ? "10:00 PM" : "5:20 PM";
-            throw new Error(`System is closed for your role between ${cutoffTime} and 7:00 AM (Warsaw Time).`);
+        //     // Give them a role-specific error message
+        //     const cutoffTime = role === "s_user" ? "10:00 PM" : "5:20 PM";
+        //     throw new Error(`System is closed for your role between ${cutoffTime} and 7:00 AM (Warsaw Time).`);
+        // }
+        const lockoutReason = isOutsideWorkingHoursInPoland(role);
+        
+        if ((role === "user" || role === "s_user") && lockoutReason) {
+            await signOut(auth);
+            throw new Error(lockoutReason); // Displays the exact dynamic message!
         }
               
         navigate("/dashboard");

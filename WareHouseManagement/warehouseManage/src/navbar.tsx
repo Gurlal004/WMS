@@ -390,10 +390,18 @@ function Navbar(){
             //     navigate("/login");
             // }
             // Condition B: Time Cutoff for users and super users
-            if ((userRole === "user" || userRole === "s_user") && isOutsideWorkingHoursInPoland(userRole)) {
-                const cutoffTime = userRole === "s_user" ? "10:00 PM" : "5:20 PM";
-                alert(`Access Restricted: Warehouse operations are closed for your role between ${cutoffTime} and 7:00 AM (Warsaw Time).`);
+            // if ((userRole === "user" || userRole === "s_user") && isOutsideWorkingHoursInPoland(userRole)) {
+            //     const cutoffTime = userRole === "s_user" ? "10:00 PM" : "5:20 PM";
+            //     alert(`Access Restricted: Warehouse operations are closed for your role between ${cutoffTime} and 7:00 AM (Warsaw Time).`);
                 
+            //     authCtx.logout();
+            //     navigate("/login");
+            //     return;
+            // }
+            const lockoutReason = isOutsideWorkingHoursInPoland(userRole);
+            
+            if ((userRole === "user" || userRole === "s_user") && lockoutReason) {
+                alert(`Access Restricted: ${lockoutReason}`);
                 authCtx.logout();
                 navigate("/login");
                 return;
